@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 0 auto; text-align: center;">
+    <h1 style="color: var(--primary-color); margin-bottom: 1rem; font-size: 2.5rem;">Gestor de Multas CDMX</h1>
+    <p style="font-size: 1.1rem; margin-bottom: 2rem; color: #555;">
+        Consulta y paga tus infracciones de tránsito de manera rápida y segura. Conoce si tu vehículo se encuentra en algún corralón y obtén las instrucciones de liberación.
+    </p>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Iniciar Sesión</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">Crear Cuenta</a>
+    </div>
+</div>
+{% endblock %}

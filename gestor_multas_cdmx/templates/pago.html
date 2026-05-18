@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+    <h2 class="text-center mb-2" style="color: var(--primary-color);">Pasarela de Pago</h2>
+    
+    <div style="background: rgba(11, 35, 30, 0.05); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+        <h4 style="margin-bottom: 1rem; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem;">Detalle de la Multa</h4>
+        <p><strong>Infracción:</strong> {{ multa.numero_infraccion }}</p>
+        <p><strong>Placa:</strong> {{ multa.placa }}</p>
+        <p><strong>Fecha:</strong> {{ multa.fecha_infraccion }}</p>
+        <h3 style="margin-top: 1rem; color: var(--secondary-color); text-align: right;">Total a Pagar: ${{ "{:,.2f}".format(multa.monto) }} MXN</h3>
+    </div>
+
+    <form method="POST" action="{{ url_for('pago', id_multa=multa.id_multa) }}" id="payment-form">
+        <h4 class="mb-1">Selecciona tu Método de Pago</h4>
+        
+        <div class="form-group" style="display: flex; gap: 1rem;">
+            <label style="flex: 1; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; text-align: center;" class="payment-option">
+                <input type="radio" name="metodo" value="tarjeta" required checked style="display: none;">
+                💳 Tarjeta (Crédito/Débito)
+            </label>
+            <label style="flex: 1; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; text-align: center;" class="payment-option">
+                <input type="radio" name="metodo" value="transferencia" style="display: none;">
+                💻 Transferencia (SPEI)
+            </label>
+            <label style="flex: 1; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; cursor: pointer; text-align: center;" class="payment-option">
+                <input type="radio" name="metodo" value="deposito" style="display: none;">
+                📄 Ficha de Depósito
+            </label>
+        </div>
+
+        <div id="card-details" class="mt-2" style="background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #eee;">
+            <p style="color: #666; font-size: 0.9em; margin-bottom: 1rem;">* Esto es un simulador. No ingreses datos reales.</p>
+            <div class="form-group">
+                <label class="form-label">Número de Tarjeta</label>
+                <input type="text" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">Vencimiento</label>
+                    <input type="text" class="form-control" placeholder="MM/AA" maxlength="5">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label">CVC</label>
+                    <input type="text" class="form-control" placeholder="123" maxlength="3">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-2" style="font-size: 1.2rem;">Confirmar y Pagar</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script simple para interactividad visual en el formulario de pago
+    document.querySelectorAll('input[name="metodo"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            // Actualizar estilos de los botones
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.style.borderColor = '#ccc';
+                opt.style.background = 'transparent';
+                opt.style.fontWeight = 'normal';
+            });
+            const selectedLabel = e.target.parentElement;
+            selectedLabel.style.borderColor = 'var(--secondary-color)';
+            selectedLabel.style.background = 'rgba(201, 0, 43, 0.05)';
+            selectedLabel.style.fontWeight = 'bold';
+
+            // Mostrar/ocultar detalles de tarjeta
+            const cardDetails = document.getElementById('card-details');
+            if(e.target.value === 'tarjeta') {
+                cardDetails.style.display = 'block';
+            } else {
+                cardDetails.style.display = 'none';
+            }
+        });
+    });
+
+    // Disparar evento para el seleccionado por defecto
+    document.querySelector('input[name="metodo"]:checked').dispatchEvent(new Event('change'));
+</script>
+{% endblock %}

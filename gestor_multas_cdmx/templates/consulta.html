@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="glass-card mb-3">
+    <h2 class="mb-2" style="color: var(--primary-color);">Consulta de Multas Vehiculares</h2>
+    
+    <form method="POST" action="{{ url_for('consulta') }}" class="d-flex gap-1 align-center">
+        <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <input type="text" id="busqueda" name="busqueda" class="form-control" required placeholder="Ingresa placa (ej. ABC-123-A) o número de infracción">
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+
+{% if resultados != None %}
+    <div class="glass-card">
+        <h3 class="mb-2" style="color: var(--primary-color);">Resultados de la Búsqueda</h3>
+        
+        {% if resultados %}
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Infracción</th>
+                            <th>Placa</th>
+                            <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Estatus</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in resultados %}
+                        <tr>
+                            <td><strong>{{ r.numero_infraccion }}</strong></td>
+                            <td>{{ r.placa }}</td>
+                            <td>{{ r.fecha_infraccion }}</td>
+                            <td>${{ "{:,.2f}".format(r.monto) }} MXN</td>
+                            <td>
+                                <span class="badge badge-{{ r.estatus }}">{{ r.estatus }}</span>
+                            </td>
+                            <td>
+                                {% if r.estatus == 'pendiente' %}
+                                    <a href="{{ url_for('pago', id_multa=r.id_multa) }}" class="btn btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.9rem;">Pagar Ahora</a>
+                                {% elif r.estatus == 'pagada' %}
+                                    <span style="color: #666; font-size: 0.9em;">En proceso de liberación</span>
+                                    <a href="{{ url_for('liberacion', id_multa=r.id_multa) }}" style="display:block; font-size:0.85em; margin-top:5px; color:var(--primary-color);">Ver Estado</a>
+                                {% elif r.estatus == 'liberada' %}
+                                    <a href="{{ url_for('liberacion', id_multa=r.id_multa) }}" style="display:block; font-size:0.85em; color:var(--primary-color);">Ver Detalles de Liberación</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mapa del corralón (solo para el primer resultado si aplica) -->
+            {% if resultados[0].id_corralon and resultados[0].estatus != 'liberada' %}
+            <div class="mt-2 p-2" style="background: rgba(201, 0, 43, 0.05); border-left: 4px solid var(--secondary-color); border-radius: 4px; padding: 1rem;">
+                <h4 style="color: var(--secondary-color); margin-bottom: 0.5rem;">⚠️ Vehículo Remitido a Corralón</h4>
+                <p><strong>Corralón:</strong> {{ resultados[0].corralon_nombre }}</p>
+                <p><strong>Dirección:</strong> {{ resultados[0].corralon_direccion }}</p>
+                <p><strong>Área Específica:</strong> {{ resultados[0].area_especifica }}</p>
+                
+                <div id="map" 
+                     data-lat="{{ resultados[0].latitud }}" 
+                     data-lng="{{ resultados[0].longitud }}" 
+                     data-title="{{ resultados[0].corralon_nombre }}">
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <div class="alert alert-success">
+                No se encontraron multas asociadas a la placa o infracción ingresada. ¡Felicidades!
+            </div>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}
