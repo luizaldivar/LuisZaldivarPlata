@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skynet Forecast - Predicción del Clima con IA</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-animation"></div>
+    <main class="container">
+        <header>
+            <h1 class="title">Skynet Forecast</h1>
+            <p class="subtitle">Predice el clima usando Inteligencia Artificial</p>
+        </header>
+
+        <div class="glass-card">
+            <form id="prediction-form" class="weather-form">
+                <div class="form-group">
+                    <label for="temp">Temperatura (°C)</label>
+                    <input type="number" id="temp" name="temp" step="any" required placeholder="Ej. 15.5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="temp_ap">Temperatura Aparente (°C)</label>
+                    <input type="number" id="temp_ap" name="temp_ap" step="any" required placeholder="Ej. 14.2">
+                </div>
+
+                <div class="form-group">
+                    <label for="humedad">Humedad (0.0 a 1.0)</label>
+                    <input type="number" id="humedad" name="humedad" step="any" required placeholder="Ej. 0.85" min="0" max="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="viento_vel">Velocidad Viento (km/h)</label>
+                    <input type="number" id="viento_vel" name="viento_vel" step="any" required placeholder="Ej. 12.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="viento_dir">Dirección Viento (grados)</label>
+                    <input type="number" id="viento_dir" name="viento_dir" step="any" required placeholder="Ej. 180">
+                </div>
+
+                <div class="form-group">
+                    <label for="visibilidad">Visibilidad (km)</label>
+                    <input type="number" id="visibilidad" name="visibilidad" step="any" required placeholder="Ej. 10.0">
+                </div>
+
+                <div class="form-group">
+                    <label for="presion">Presión (milibares)</label>
+                    <input type="number" id="presion" name="presion" step="any" required placeholder="Ej. 1015.0">
+                </div>
+
+                <button type="submit" id="btn-predict" class="btn-primary">
+                    <span class="btn-text">Predecir Clima</span>
+                    <span class="loader" id="loader" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+
+        <div id="result-container" class="result-card hidden">
+            <h2 class="result-title">Pronóstico</h2>
+            <p id="prediction-text" class="prediction-value">--</p>
+            <div class="recommendation-box">
+                <p id="recommendation-text" class="recommendation-value">--</p>
+            </div>
+            <button id="btn-reset" class="btn-secondary">Hacer otra predicción</button>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Elementos UI
+            const btn = document.getElementById('btn-predict');
+            const btnText = document.querySelector('.btn-text');
+            const loader = document.getElementById('loader');
+            const resultContainer = document.getElementById('result-container');
+            const predictionFormContainer = document.querySelector('.glass-card');
+            
+            // Recoger datos
+            const formData = {
+                temp: document.getElementById('temp').value,
+                temp_ap: document.getElementById('temp_ap').value,
+                humedad: document.getElementById('humedad').value,
+                viento_vel: document.getElementById('viento_vel').value,
+                viento_dir: document.getElementById('viento_dir').value,
+                visibilidad: document.getElementById('visibilidad').value,
+                presion: document.getElementById('presion').value
+            };
+
+            // Mostrar estado de carga
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('prediction-text').innerText = result.prediction;
+                    document.getElementById('recommendation-text').innerText = result.recommendation;
+                    
+                    // Mostrar resultados y ocultar formulario
+                    predictionFormContainer.classList.add('hidden');
+                    resultContainer.classList.remove('hidden');
+                    
+                    // Pequeña animación para que aparezca suavemente
+                    setTimeout(() => {
+                        resultContainer.style.opacity = 1;
+                        resultContainer.style.transform = 'translateY(0)';
+                    }, 50);
+
+                } else {
+                    alert('Error: ' + result.error);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un error al conectar con el servidor.');
+            } finally {
+                // Restaurar botón
+                btn.disabled = false;
+                btnText.style.display = 'inline-block';
+                loader.style.display = 'none';
+            }
+        });
+
+        document.getElementById('btn-reset').addEventListener('click', function() {
+            const resultContainer = document.getElementById('result-container');
+            const predictionFormContainer = document.querySelector('.glass-card');
+
+            // Ocultar resultados y mostrar formulario de nuevo
+            resultContainer.classList.add('hidden');
+            resultContainer.style.opacity = 0;
+            resultContainer.style.transform = 'translateY(20px)';
+            
+            predictionFormContainer.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>

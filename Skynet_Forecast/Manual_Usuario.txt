@@ -1,0 +1,45 @@
+======================================================
+         MANUAL DE USUARIO - SKYNET FORECAST
+======================================================
+
+1. ¿QUÉ ES SKYNET FORECAST?
+------------------------------------------------------
+Skynet Forecast es un sistema web impulsado por Inteligencia Artificial (Machine Learning) diseñado para predecir el clima. El sistema utiliza un modelo de "Random Forest" (Bosque Aleatorio) que aprende patrones ocultos a partir del dataset histórico 'weatherHistory.csv'. A partir de unos valores proporcionados por el usuario, el modelo puede deducir el tipo de clima que hará ese día y arrojar recomendaciones prácticas.
+
+
+2. FUNCIONES DEL SISTEMA
+------------------------------------------------------
+* Entrenamiento Automático:
+Al iniciar el servidor (ejecutando 'python app.py'), la IA automáticamente analiza el historial climático y ajusta sus algoritmos de predicción.
+
+* Predicción en Tiempo Real:
+Al introducir los datos meteorológicos y presionar "Predecir Clima" en la plataforma web, el motor de IA toma los parámetros introducidos e instantáneamente devuelve una predicción sin tener que recargar la página web.
+
+* Recomendaciones Personalizadas:
+Una vez que el modelo deduce el tipo de clima (lluvia, nieve, despejado, nublado o neblina), Skynet Forecast procesa ese resultado y genera un consejo útil en español (por ejemplo: "Se esperan lluvias, lleva paraguas").
+
+
+3. CONCEPTOS DE LOS PARÁMETROS ATMOSFÉRICOS
+------------------------------------------------------
+Para hacer una predicción certera, el sistema te pedirá 7 datos clave. A continuación se explica el significado de cada uno:
+
+- Temperatura (°C): 
+La temperatura térmica real del ambiente, medida en grados centígrados (Celsius).
+
+- Temperatura Aparente (°C): 
+También conocida como "Sensación Térmica". Representa la temperatura que realmente percibe el cuerpo humano al estar al aire libre, y suele verse modificada por la humedad y el viento.
+
+- Humedad (0.0 a 1.0): 
+Es la concentración de vapor de agua en el ambiente. En el sistema debe ingresarse como un valor decimal donde 0.0 significa aire completamente seco (0%) y 1.0 significa máxima saturación (100%). Un valor de humedad muy alto suele significar posibilidad de lluvia o neblina.
+
+- Velocidad del Viento (km/h): 
+Mide qué tan rápido se está moviendo la corriente de aire, usando como unidad kilómetros por hora.
+
+- Dirección del Viento (grados): 
+Representa desde dónde sopla el viento, utilizando la escala de la brújula en grados (de 0 a 360). Por ejemplo, 0 grados es Norte puro, 90 es Este, 180 es Sur, y 270 es Oeste.
+
+- Visibilidad (km): 
+Es la mayor distancia horizontal en kilómetros a la que se pueden reconocer claramente los objetos a simple vista. Una visibilidad baja (como 2 o 3 km) es indicador de niebla o precipitaciones severas.
+
+- Presión (milibares): 
+Es el peso que ejerce el aire sobre la superficie. Un valor estándar ronda los 1013 milibares. Caídas drásticas en la presión atmosférica frecuentemente pronostican la llegada de tormentas.
